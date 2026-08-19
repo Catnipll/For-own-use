@@ -2,7 +2,7 @@
 mixed-port: 7890
 
 # 允许局域网连接
-allow-lan: false
+allow-lan: true
 #  find-process-mode has 3 values:always, strict, off
 #  - always, 开启，强制匹配所有进程
 #  - strict, 默认，由 mihomo 判断是否开启
@@ -13,7 +13,7 @@ find-process-mode: strict
 mode: rule
 
 # 设置日志输出级别：silent / error / warning / info / debug。级别越高日志输出量越大，越倾向于调试，若需要请自行开启。
-log-level: info
+log-level: warning
 # 开启 IPv6 总开关，关闭阻断所有 IPv6 链接和屏蔽 DNS 请求 AAAA 记录
 ipv6: true
 # 是否允许 UDP 通过代理，默认为 false。此选项在 TUIC 等基于 UDP 的协议以及 direct 和 dns 类型中默认开启
@@ -91,6 +91,7 @@ dns:
   enhanced-mode: fake-ip 
   # fake-ip 池设置
   fake-ip-range: 198.18.0.1/16 
+  direct-nameserver-follow-policy: true
   # 配置不使用 fake-ip 的域名
   fake-ip-filter:
     # 本地域名
@@ -116,26 +117,28 @@ dns:
     - 119.29.29.29
   # 强制部分请求走直连 DNS 解析（用于 DIRECT 规则）
   direct-nameserver:
-    - https://dns.alidns.com/dns-query#DIRECT
-    - https://doh.pub/dns-query#DIRECT
+    - 223.5.5.5
+    - 119.29.29.29
   # 代理服务器域名解析（用于连接节点服务器）
   proxy-server-nameserver:
-    - https://dns.alidns.com/dns-query#DIRECT
-    - https://doh.pub/dns-query#DIRECT
+    - https://dns.alidns.com/dns-query#DIRECT      # 阿里云 IP
+    - https://doh.pub/dns-query#DIRECT    # DNSPod/腾讯云 IP
   # 根据域名分流 DNS
   nameserver-policy:
     # 国内域名使用国内 DNS
     "geosite:cn":
-      - https://dns.alidns.com/dns-query#DIRECT
-      - https://doh.pub/dns-query#DIRECT
-    # 海外域名使用代理 DNS
-    "geosite:!cn":
-      - https://dns.google/dns-query#PROXY
-      - https://cloudflare-dns.com/dns-query#PROXY
+      - https://dns.alidns.com/dns-query#DIRECT        # 阿里云 IP
+      - https://doh.pub/dns-query#DIRECT     # DNSPod/腾讯云 IP
   # 主要解析服务器 （作为兜底）
   nameserver: 
-    - https://dns.alidns.com/dns-query#DIRECT
-    - https://doh.pub/dns-query#DIRECT
+    - https://dns.cloudflare.com/dns-query#PROXY      # cloudflare
+    - https://dns.google/dns-query#PROXY     # google
+
+hosts:
+  'dns.alidns.com': ['223.5.5.5', '223.6.6.6']
+  'doh.pub': ['1.12.12.12', '120.53.53.53']
+  'dns.cloudflare.com': ['1.1.1.1', '1.0.0.1']
+  'dns.google': ['8.8.8.8', '8.8.4.4']
 
 
 proxies: {{ getClashNodes(nodeList) | json }}
