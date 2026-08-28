@@ -29,11 +29,13 @@ skip-proxy = 192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,localhost,*.local,e.crashly
 # > Always Real IP Hosts
 # DNS 数据包将被转发到上游 DNS 服务器。
 real-ip = *.apple.com,*apple.com
+# 一般我们平常接触的客户端-服务器模型都是 客户端先发请求 → 服务器响应（典型如 HTTP、DNS、gRPC）。但存在一些协议/服务，在连接建立成功后是服务器先发数据，比如邮件协议族（SMTP、POP3、IMAP）、FTP、IRC、Telnet/老式交互协议。由于Loon会等待客户端第一个数据包后根据包中内容进行规则匹配，所以对这类服务处理可能存在异常。该参数是为了跳过解析第一个数据包，直接使用域名、IP、端口进行规则匹配后连接，然后接收服务器数据。如果遇到配置的域名跳过了第一个数据包，但实际是http/s，读取到第一个数据包后依然会再次使用url等信息匹配规则。默认非443和非80，都会尝试跳过检测，直接发起连接。
+# skip-first-packet = example.com:443
 # 绕过路由
 bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,192.88.99.0/24,192.168.0.0/16,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,255.255.255.255/32
 # DNS 服务器
 dns-server = 223.5.5.5,119.29.29.29
-# doh-server = https://223.5.5.5/dns-query, https://8.8.8.8/dns-query
+# doh-server = https://223.5.5.5/dns-query,https://8.8.8.8/dns-query
 # Hijack DNS
 # 默认情况下，Loon 只返回发送到 Loon DNS 地址的 DNS 查询的假 IP 地址(198.18.0.2)。
 # 有些设备或软件总是使用硬编码的 DNS 服务器。 (例如 Google Speakers 总是使用 8.8.8.8)。 您可以使用此选项劫持查询，以获得一个假地址。
@@ -41,7 +43,7 @@ hijack-dns = 8.8.8.8:53,8.8.4.4:53
 # Wi-Fi 访问
 allow-wifi-access = false
 wifi-access-http-port = 1234
-wifi-access-socks5-port = 1235
+wifi-access-socks5-port = 1234
 mitm-on-wifi-access = false
 # 代理测速 URL
 internet-test-url = http://connectivitycheck.platform.hicloud.com/generate_204
@@ -56,38 +58,52 @@ interface-mode = auto
 resource-parser = https://raw.githubusercontent.com/sub-store-org/Sub-Store/release/sub-store-parser.loon.min.js
 
 [Proxy Group]
-FINAL = select, DIRECT, PROXY, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png
-PROXY = select, HK, SG, JP, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Proxy.png
-Emby = select, HK, SG, US, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Emby.png
-HK = select, Nex-HK, Bywave-HK, SYT-HK, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png
-SG = select, Nex-SG, Bywave-SG, SYT-SG, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png
-JP = select, Nex-JP, Bywave-JP, SYT-JP, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png
-US = select, Nex-US, Bywave-US, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/US.png
-Nex-HK = fallback, Nex-香港, interval = 600, max-timeout = 3000, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png
-Bywave-HK = fallback, Bywave-香港, interval = 600, max-timeout = 3000, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png
-SYT-HK = fallback, SYT-香港, interval = 600, max-timeout = 3000, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png
-Nex-SG = fallback, Nex-新加坡, interval = 600,max-timeout = 3000, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png
-Bywave-SG = fallback, Bywave-新加坡, interval = 600, max-timeout = 3000, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png
-SYT-SG = fallback, SYT-新加坡, interval = 600, max-timeout = 3000, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png
-Nex-JP = fallback, Nex-日本, interval = 600, max-timeout = 3000, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png
-Bywave-JP = fallback, Bywave-新加坡, interval = 600, max-timeout = 3000, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png
-SYT-JP = fallback, SYT-日本, interval = 600, max-timeout = 3000, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png
-Nex-US = fallback, Nex-美国, interval = 600, max-timeout = 3000, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/US.png
-Bywave-US = fallback, ywave-美国, interval = 600, max-timeout = 3000, img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/US.png
+FINAL = select,DIRECT,PROXY,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png
+PROXY = select,HK,SG,JP,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Proxy.png
+Emby = select,DIRECT,SG,JP,US,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Emby.png
+Telegram = select,HK,SG,JP,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Telegram.png
+HK = select,Nex-HK,Mesl-HK,Flower-HK,Bywave-HK,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png
+SG = select,Nex-SG,Mesl-SG,Flower-SG,Bywave-SG,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png
+JP = select,Nex-JP,Mesl-JP,Flower-JP,Bywave-JP,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png
+US = select,Nex-US,Mesl-US,Flower-US,Bywave-US,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/US.png
+Nex-HK = url-test,Nex-香港,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png
+Bywave-HK = url-test,Bywave-香港,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png
+Mesl-HK = url-test,Mesl-香港,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png
+Flower-HK = url-test,Flower-香港,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/HK.png
+Nex-SG = url-test,Nex-新加坡,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png
+Bywave-SG = url-test,Bywave-新加坡,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png
+Mesl-SG = url-test,Mesl-新加坡,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png
+Flower-SG = url-test,Flower-新加坡,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/SG.png
+Nex-JP = url-test,Nex-日本,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png
+Bywave-JP = url-test,Bywave-日本,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png
+Mesl-JP = url-test,Mesl-日本,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png
+Flower-JP = url-test,Flower-日本,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/JP.png
+Nex-US = url-test,Nex-美国,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/US.png
+Bywave-US = url-test,Bywave-美国,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/US.png
+Mesl-US = url-test,Mesl-美国,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/US.png
+Flower-US = url-test,Flower-美国,interval = 600,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/US.png
 
 [Remote Filter]
-Nex-香港 = NameRegex, Chen, FilterKey = "Hong Kong 0[345]"
-Bywave-香港 = NameRegex, Bywave, FilterKey = "香港0[234]"
-SYT-香港 = NameRegex, ShiYanTian, FilterKey = "香港 0[1234]"
-Nex-日本 = NameRegex, Chen, FilterKey = "Japan 0[345]"
-Bywave-日本 = NameRegex, Bywave, FilterKey = "东京0[12]"
-SYT-日本 = NameRegex, ShiYanTian, FilterKey = "日本"
-Nex-新加坡 = NameRegex, Chen, FilterKey = "Singapore 0[345]"
-Bywave-新加坡 = NameRegex, Bywave, FilterKey = "新加坡0[12]"
-SYT-新加坡 = NameRegex, ShiYanTian, FilterKey = "狮城"
-Nex-美国 = NameRegex, Chen, FilterKey = "USA Seattle 0[345]"
-Bywave-美国 = NameRegex, Bywave, FilterKey = "芝加哥|洛杉矶"
-Nex-德国 = NameRegex, Chen, FilterKey = "Germany 0[12]"
+Nex-香港 = NameRegex,Nex, FilterKey = "Hong Kong 2[012]"
+Bywave-香港 = NameRegex,Bywave, FilterKey = "香港0[234]"
+Mesl-香港 = NameRegex,Mesl, FilterKey = "香港 0[456]"
+Flower-香港 = NameKeyword,FlowerCloud, FilterKey = "香港高级"
+LXY-香港 = NameKeyword,LiangXinYun, FilterKey = "香港专线"
+Nex-日本 = NameRegex,Nex, FilterKey = "Japan 2[23]"
+Bywave-日本 = NameRegex,Bywave, FilterKey = "日本0[12]"
+Mesl-日本 = NameRegex,Mesl, FilterKey = "日本 0[456]"
+Flower-日本 = NameKeyword,FlowerCloud, FilterKey = "日本高级"
+LXY-日本 = NameKeyword,LiangXinYun, FilterKey = "日本专线"
+Nex-新加坡 = NameRegex,Nex, FilterKey = "Singapore 11"
+Bywave-新加坡 = NameRegex,Bywave, FilterKey = "新加坡0[12]"
+Mesl-新加坡 = NameRegex,Mesl, FilterKey = "新加坡 0[456]"
+Flower-新加坡 = NameKeyword,FlowerCloud, FilterKey = "新加坡高级"
+LXY-新加坡 = NameKeyword,LiangXinYun, FilterKey = "新加坡专线"
+Nex-美国 = NameRegex,Nex, FilterKey = "USA San Jose 0[123456]"
+Bywave-美国 = NameRegex,Bywave, FilterKey = "芝加哥|洛杉矶"
+Mesl-美国 = NameRegex,Mesl, FilterKey = "美国 0[456]"
+Flower-美国 = NameKeyword,FlowerCloud, FilterKey = "美国高级"
+LXY-美国 = NameKeyword,LiangXinYun, FilterKey = "美国高速"
 
 [Host]
 
@@ -106,20 +122,42 @@ https://raw.githubusercontent.com/Tartarus2014/Loon-Script/refs/heads/master/Rul
 https://raw.githubusercontent.com/Tartarus2014/For-own-use/master/Ruleset/PT/PT_Direct.list, policy=DIRECT, tag=PT, enabled=true
 https://raw.githubusercontent.com/Tartarus2014/For-own-use/master/Ruleset/PT/PT.list, policy=SG, tag=PT, enabled=true
 https://raw.githubusercontent.com/Tartarus2014/Loon-Script/refs/heads/master/Rule/Media/TikTok.lsr, policy=JP, tag=TikTok, enabled=true
-https://raw.githubusercontent.com/Tartarus2014/Loon-Script/refs/heads/master/Rule/Other/Telegram.lsr, policy=PROXY, tag=Telegram, enabled=true
+https://raw.githubusercontent.com/Tartarus2014/Loon-Script/refs/heads/master/Rule/Other/Telegram.lsr, policy=Telegram, tag=Telegram, enabled=true
+https://raw.githubusercontent.com/Tartarus2014/Loon-Script/refs/heads/master/Rule/Direct.lsr, policy=DIRECT, tag=DIRECT, enabled=true
 https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ProxyGFWlist.list, policy=PROXY, tag=PROXY, enabled=true
 https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ProxyLite.list, policy=PROXY, tag=PROXY, enabled=true
 https://raw.githubusercontent.com/Tartarus2014/For-own-use/master/Ruleset/Proxy.list, policy=PROXY, tag=PROXY, enabled=true
-https://raw.githubusercontent.com/Tartarus2014/For-own-use/refs/heads/master/Loon/Rule/Direct.lsr, policy=DIRECT, tag=DIRECT, enabled=true
-https://raw.githubusercontent.com/Tartarus2014/Loon-Script/refs/heads/master/Rule/GEOIP.lsr, policy=DIRECT, tag=GEOIP_CN, enabled=true
+https://raw.githubusercontent.com/Tartarus2014/Loon-Script/master/Rule/GEOIP.lsr, policy=DIRECT, tag=GEOIP_CN, enabled=true
 
 [Plugin]
-https://raw.githubusercontent.com/Script-Hub-Org/Script-Hub/main/modules/script-hub.loon.plugin, policy=PROXY, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Remove_ads_by_keli.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/WeatherChina_remove_ads.lpx, enabled=true
+https://raw.githubusercontent.com/sub-store-org/Sub-Store/refs/heads/master/config/Loon-parser.plugin, policy=PROXY, pin=true, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Remove_ads_by_keli.lpx, pin=true, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, pin=true, enabled=true
+https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, pin=true, enabled=true
+https://raw.githubusercontent.com/MaYIHEI/paperclip/refs/heads/main/loon/ipquality-web-test/ipquality-web-test.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/CoolApk_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/YouKu_Video_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Tieba_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Dewu_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/TaobaoTravel_remove_ads.lpx, enabled=true
+https://raw.githubusercontent.com/Script-Hub-Org/Script-Hub/main/modules/script-hub.loon.plugin, policy=PROXY, pin=true, enabled=false
+https://raw.githubusercontent.com/Tartarus2014/For-own-use/refs/heads/master/Loon/Plugin/FKTG.lpx, enabled=true
+https://raw.githubusercontent.com/Tartarus2014/For-own-use/refs/heads/master/Loon/Plugin/skip-proxy.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/XiaomiSpeaker_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Weibo_remove_ads.lpx, enabled=false
+https://kelee.one/Tool/Loon/Lpx/NeteaseCloudMusic_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Taobao_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/smzdm_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/MeiTu_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/ColorfulClouds_remove_ads.lpx, enabled=false
+https://kelee.one/Tool/Loon/Lpx/BaiduNetDisk_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/iQiYi_Video_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/SnowCamera_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/YouTube_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/12306_remove_ads.lpx, enabled=true
 https://kelee.one/Tool/Loon/Lpx/JD_remove_ads.lpx, enabled=true
-https://raw.githubusercontent.com/Tartarus2014/For-own-use/refs/heads/master/Loon/Plugin/JD.plugin, enabled=true
+https://raw.githubusercontent.com/Tartarus2014/For-own-use/refs/heads/master/Loon/Plugin/JD.lpx, tag=京东比价, enabled=true
 https://kelee.one/Tool/Loon/Lpx/VVebo_repair.lpx, enabled=true
 https://kelee.one/Tool/Loon/Lpx/SF-Express_remove_ads.lpx, enabled=true
 https://kelee.one/Tool/Loon/Lpx/PinDuoDuo_remove_ads.lpx, enabled=true
@@ -137,10 +175,8 @@ https://raw.githubusercontent.com/app2smile/rules/master/plugin/qidian.plugin, e
 https://github.com/BiliUniverse/Redirect/releases/latest/download/BiliBili.Redirect.plugin, enabled=true
 https://github.com/BiliUniverse/ADBlock/releases/latest/download/BiliBili.ADBlock.plugin, enabled=true
 https://github.com/BiliUniverse/Enhanced/releases/latest/download/BiliBili.Enhanced.plugin, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Tieba_remove_ads.lpx, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Weixin_external_links_unlock.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Node_detection_tool.lpx, enabled=true
-https://raw.githubusercontent.com/chavyleung/scripts/master/box/rewrite/boxjs.rewrite.loon.plugin, enabled=true
+https://raw.githubusercontent.com/chavyleung/scripts/master/box/rewrite/boxjs.rewrite.loon.plugin, policy=PROXY, enabled=true
 
 [Mitm]
 skip-server-cert-verify = true
